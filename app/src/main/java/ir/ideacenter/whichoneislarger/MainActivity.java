@@ -1,5 +1,6 @@
 package ir.ideacenter.whichoneislarger;
 
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,8 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
 
     private final int GAME_LEVEL_MAX = 10;
+    private final int GAME_TIME_MAX_MILLIS = 10000;
+    private final int GAME_TIME_TICK_MILLIS = 1000;
     private final int NUMBER_RANGE = 30;
     private final int LEFT_BUTTON = 0;
     private final int RIGHT_BUTTON = 1;
@@ -39,6 +42,20 @@ public class MainActivity extends AppCompatActivity {
         currentLeftNumber = 0;
         currentRightNumber = 0;
         gameFinished = false;
+
+        CountDownTimer gameTimer = new CountDownTimer(GAME_TIME_MAX_MILLIS, GAME_TIME_TICK_MILLIS) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                gameLevelBoard.setText(getString(R.string.game_timer, (int) (millisUntilFinished / 1000)));
+            }
+
+            @Override
+            public void onFinish() {
+                gameFinished = true;
+                gameLevelBoard.setText(getString(R.string.game_finished));
+            }
+        };
+        gameTimer.start();
 
         findViews();
         setButtonOnClicks();
@@ -90,20 +107,21 @@ public class MainActivity extends AppCompatActivity {
             if (currentLeftNumber == currentRightNumber) userScore++;
         }
 
-        if (gameLevel == GAME_LEVEL_MAX) {
+        /*if (gameLevel == GAME_LEVEL_MAX) {
             gameFinished = true;
         }
         else {
             gameLevel++;
-        }
+        }*/
     }
 
     private void updateBoards() {
         userScoreBoard.setText(getString(R.string.user_points, userScore));
-        if (!gameFinished)
+        /*if (!gameFinished) {
             gameLevelBoard.setText(getString(R.string.game_level, gameLevel, GAME_LEVEL_MAX));
+        }
         else
-            gameLevelBoard.setText(getString(R.string.game_finished));
+            gameLevelBoard.setText(getString(R.string.game_finished));*/
 
     }
 

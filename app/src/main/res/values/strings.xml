@@ -3,4 +3,5 @@
     <string name="user_points">Your points: %d</string>
     <string name="game_level">Level: %d out of %d</string>
     <string name="game_finished">Game Finished!</string>
+    <string name="game_timer">Time remained: %d</string>
 </resources>
