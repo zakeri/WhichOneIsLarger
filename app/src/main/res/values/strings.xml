@@ -4,4 +4,6 @@
     <string name="game_level">Level: %d out of %d</string>
     <string name="game_finished">Game Finished!</string>
     <string name="game_timer">Time remained: %d</string>
+    <string name="enter_your_name">Enter your name:</string>
+    <string name="confirm">Confirm</string>
 </resources>

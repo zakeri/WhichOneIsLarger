@@ -32,9 +32,14 @@ public class GameFragment extends Fragment {
     private int userScore;
     private int currentLeftNumber;
     private int currentRightNumber;
+    private String playerName;
     Boolean gameFinished;
 
     CountDownTimer gameTimer;
+
+    private void readArguments(Bundle bundle) {
+        playerName = getArguments().getString("player_name", null);
+    }
 
     @Nullable
     @Override
@@ -45,6 +50,8 @@ public class GameFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        readArguments(savedInstanceState);
 
         gameLevel = 0;
         userScore = 0;
@@ -62,6 +69,12 @@ public class GameFragment extends Fragment {
             public void onFinish() {
                 gameFinished = true;
                 gameLevelBoard.setText(getString(R.string.game_finished));
+                HighScoreUser hsu = SharedPreferenceManager.getInstance(getActivity()).getHighScoreUser();
+                if (hsu == null || hsu.getHighScore() < userScore) {
+                    SharedPreferenceManager.getInstance(getActivity()).putHighScoreUser(
+                            userScore,playerName
+                    );
+                }
             }
         };
         gameTimer.start();
