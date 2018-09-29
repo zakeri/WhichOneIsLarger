@@ -4,9 +4,7 @@ public class HighScoreUser {
     private String userName;
     private int highScore;
 
-    public HighScoreUser(String userName, int highScore) {
-        this.userName = userName;
-        this.highScore = highScore;
+    public HighScoreUser() {
     }
 
     public String getUserName() {

@@ -33,7 +33,9 @@ public class SharedPreferenceManager {
     }
 
     public void putHighScoreUser(int highScore, String userName) {
-        HighScoreUser h = new HighScoreUser(userName, highScore);
+        HighScoreUser h = new HighScoreUser();
+        h.setUserName(userName);
+        h.setHighScore(highScore);
         Gson gson = new Gson();
         String hs = gson.toJson(h, HighScoreUser.class);
         editor.putString("high_score_user", hs);
