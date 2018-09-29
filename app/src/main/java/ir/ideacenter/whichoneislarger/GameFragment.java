@@ -1,5 +1,9 @@
 package ir.ideacenter.whichoneislarger;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -9,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Random;
@@ -27,13 +32,16 @@ public class GameFragment extends Fragment {
     Button leftButton;
     Button rightButton;
     Button equalButton;
+    LinearLayout gameContainer;
+    TextView gameCountDown;
 
     private int gameLevel;
     private int userScore;
     private int currentLeftNumber;
     private int currentRightNumber;
     private String playerName;
-    Boolean gameFinished;
+    private Boolean gameFinished;
+    private int countDownInt = 3;
 
     CountDownTimer gameTimer;
 
@@ -59,6 +67,78 @@ public class GameFragment extends Fragment {
         currentRightNumber = 0;
         gameFinished = false;
 
+
+
+        findViews(view);
+        setButtonOnClicks();
+        startCountDown();
+        //startGame();
+    }
+
+    private void startCountDown() {
+        ObjectAnimator rotation = ObjectAnimator.ofFloat(
+                gameCountDown,
+                "rotation",
+                0f, 45f, -45f, 45f, 0
+        );
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(
+                gameCountDown,
+                "scaleX",
+                1f, 3f, 1f, 2f
+        );
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(
+                gameCountDown,
+                "scaleY",
+                1f, 3f, 1f, 2f
+        );
+        ObjectAnimator alpha = ObjectAnimator.ofFloat(
+                gameCountDown,
+                "alpha",
+                0.7f, 1f, 0.5f, 0f
+        );
+        ObjectAnimator translationX = ObjectAnimator.ofFloat(
+                gameCountDown,
+                "translationY",
+                0f, 100f, -200f
+        );
+        rotation.setDuration(1000);
+        scaleX.setDuration(1000);
+        scaleY.setDuration(1000);
+        alpha.setDuration(1000);
+        translationX.setDuration(1000);
+
+        AnimatorSet animation = new AnimatorSet();
+        animation.playTogether(rotation, scaleX, scaleY, alpha, translationX);
+        animation.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                gameCountDown.setText(String.valueOf(countDownInt));
+                countDownInt--;
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (countDownInt > 0)
+                    startCountDown();
+                else {
+                    gameCountDown.setVisibility(View.INVISIBLE);
+                    startGame();
+                }
+            }
+        });
+        animation.start();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        gameTimer.cancel();
+    }
+
+    private void startGame() {
+        gameContainer.setVisibility(View.VISIBLE);
         gameTimer = new CountDownTimer(GAME_TIME_MAX_MILLIS, GAME_TIME_TICK_MILLIS) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -69,28 +149,18 @@ public class GameFragment extends Fragment {
             public void onFinish() {
                 gameFinished = true;
                 gameLevelBoard.setText(getString(R.string.game_finished));
-                HighScoreUser hsu = SharedPreferenceManager.getInstance(getActivity()).getHighScoreUser();
-                if (hsu == null || hsu.getHighScore() < userScore) {
-                    SharedPreferenceManager.getInstance(getActivity()).putHighScoreUser(
-                            userScore,playerName
-                    );
-                }
+                HighScoreList hsl = SharedPreferenceManager.getInstance(getActivity()).getHighScoreList();
+                HighScoreUser hsu = new HighScoreUser();
+                hsu.setHighScore(userScore);
+                hsu.setUserName(playerName);
+                hsl.addHighScoreUser(hsu);
+                SharedPreferenceManager.getInstance(getActivity()).putHighScoreList(hsl);
             }
         };
         gameTimer.start();
-
-        findViews(view);
-        setButtonOnClicks();
         generateNumbers();
         gameLevel++;
         updateBoards();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        gameTimer.cancel();
     }
 
     private void setButtonOnClicks() {
@@ -168,6 +238,8 @@ public class GameFragment extends Fragment {
         equalButton = (Button) view.findViewById(R.id.equal_button);
         userScoreBoard = (TextView) view.findViewById(R.id.user_score);
         gameLevelBoard = (TextView) view.findViewById(R.id.game_level);
+        gameContainer = (LinearLayout) view.findViewById(R.id.game_container);
+        gameCountDown = (TextView) view.findViewById(R.id.game_count_down);
     }
 
     private int generateInt() {

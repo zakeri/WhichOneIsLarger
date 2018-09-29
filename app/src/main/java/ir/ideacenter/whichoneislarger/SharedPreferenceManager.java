@@ -32,13 +32,27 @@ public class SharedPreferenceManager {
         return gson.fromJson(user, HighScoreUser.class);
     }
 
-    public void putHighScoreUser(int highScore, String userName) {
-        HighScoreUser h = new HighScoreUser();
-        h.setUserName(userName);
-        h.setHighScore(highScore);
+    public void putHighScoreUser(HighScoreUser hsu) {
         Gson gson = new Gson();
-        String hs = gson.toJson(h, HighScoreUser.class);
+        String hs = gson.toJson(hsu, HighScoreUser.class);
         editor.putString("high_score_user", hs);
         editor.apply();
     }
+
+    public HighScoreList getHighScoreList() {
+        String hsl = sharedPreferences.getString("high_score_list", null);
+        if (hsl == null) {
+            return new HighScoreList();
+        }
+        Gson gson = new Gson();
+        return gson.fromJson(hsl, HighScoreList.class);
+    }
+
+    public void putHighScoreList(HighScoreList list) {
+        Gson gson = new Gson();
+        String hsl = gson.toJson(list, HighScoreList.class);
+        editor.putString("high_score_list", hsl);
+        editor.apply();
+    }
+
 }
